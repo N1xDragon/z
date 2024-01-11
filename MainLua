@@ -1,0 +1,220 @@
+local workspaces = game:GetService("Workspace") --Getting Services
+local us = game:GetService("UserInputService")
+local tw = game:GetService('TweenService')
+local repf = game:GetService("ReplicatedFirst")
+local rep game:GetService("ReplicatedStorage")
+local soundservice = game:GetService("SoundService")
+local plrclient = game:GetService('Players').LocalPlayer -- client player
+local PlrCharacter = plrclient.Character or plrclient.CharacterAdded:Wait() -- Client Character Or if not character then wait()
+local guis = plrclient.PlayerGui -- Client PlayerGui
+local menu = guis:WaitForChild("Menu", math.huge) -- Wait For Menu
+local Camera = workspaces.Camera
+local tgpl, tgdn, tgst, tg, skip = false, false, false, false, false -- Toggles for check
+local tgpr, tglg = false, false --Toggles for camera check
+while task.wait() do -- While Waiting For Disable Emote
+	pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, false) end)
+	break
+end
+for _, v in pairs(menu:WaitForChild("MainMenuBackground", math.huge):GetDescendants()) do -- Gathers everything inside about the details in menu
+	if v:IsA("TextButton") then -- for MouseButton or other event
+		v.MouseButton1Click:Connect(function() -- Buttons was clicked
+			if v.Name == "PlayButton" then -- Name of Detail for working
+				if script:WaitForChild("Settings"):WaitForChild("Mode").Value == "Basic" then -- If mode value in basic 
+					if tgpl == true then return end -- if toggleplay in true then don't working
+					local sound = soundservice:WaitForChild("Modes"):WaitForChild("SmurfEng") -- Audio
+					local fr = menu:WaitForChild("Frame")
+					tgpl = true -- TogglePlay is true now
+					us.MouseIconEnabled = false -- Mouse don't will enabled for client
+					menu.MainMenuBackground.Visible = false -- Menu MainBackground in not visbile
+					soundservice:WaitForChild("Menu"):WaitForChild("Click"):Play() -- ClickAudio Playing
+					game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)  -- PlayerList will unvisble
+					tw:Create(soundservice:WaitForChild("Menu"):WaitForChild("Background"),TweenInfo.new(2),{Volume = 0}):Play() -- smoothly mutes the volume
+					tw:Create(fr,TweenInfo.new(2),{BackgroundTransparency = 0}):Play() -- smoothly fades away 
+					fr.LoadedText.Visible = true -- Loading text into Show
+					repeat wait() until sound.IsLoaded -- waits for the audio to load and then other processes
+					soundservice.Menu.Background:Stop() -- Background audio stop!
+					fr.LoadedText.Visible = false --Loading text into UnShow
+					game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(true) -- Sending Info about client playing
+					task.wait(2) -- Waiting 2 sec
+					soundservice.Modes.SmurfEng:Play()
+					tw:Create(soundservice:WaitForChild("Modes"):WaitForChild("SmurfEng"),TweenInfo.new(2),{Volume = 1.25}):Play()
+					tw:Create(fr,TweenInfo.new(1.25),{BackgroundTransparency = 1}):Play()
+					for _, v in pairs(fr.Cut1:GetDescendants()) do -- collects parts in Cutscene1
+						if v:IsA("ImageLabel") then
+							v.Visible = true -- every imagelabel in visible for Cutscene1!
+						end
+					end
+					fr.FrameTxt.Visible = true --FrameTexts for upside text in visible
+					fr.FrameTxt.Textmad.Text = "There's a ghost inside me" -- Text Change For Cutscene lyrics 1x
+					task.wait(4) -- Waiting 4 sec
+					fr.FrameTxt.Visible = false
+					tw:Create(fr,TweenInfo.new(0.5),{BackgroundTransparency = 0}):Play() -- Smoothly visible
+					task.wait(0.5) -- Waiting 0.5 sec
+					for _, v in pairs(fr.Cut1:GetDescendants()) do -- collects parts in Cutscene1
+						if v:IsA("ImageLabel") then -- Image detail
+							v.Visible = false -- every imagelabel in unvisible for Cutscene1!
+						end
+					end
+					for _, v in pairs(fr.Cut2:GetDescendants()) do -- collects parts in Cutscene2
+						if v:IsA("ImageLabel") then
+							v.Visible = true -- every imagelabel in visible for Cutscene2!
+						end
+					end
+					tw:Create(fr,TweenInfo.new(0.5),{BackgroundTransparency = 1}):Play() -- Smoothly unvisible
+					fr.FrameTxt.Visible = true
+					fr.FrameTxt.Textmad.Text = "It all belongs to the other side" -- Text Change For Cutscene lyrics 2x
+					task.wait(4) -- Waiting 4 sec
+					fr.FrameTxt.Visible = false
+					tw:Create(fr,TweenInfo.new(0.2),{BackgroundTransparency = 0}):Play() -- Smoothly visible
+					task.wait(0.2) -- Waiting 0.2 sec
+					for _, v in pairs(fr.Cut2:GetDescendants()) do -- collects parts in Cutscene2
+						if v:IsA("ImageLabel") then
+							v.Visible = false -- every imagelabel in unvisible for Cutscene2!
+						end
+					end
+					for _, v in pairs(fr.Cut3:GetDescendants()) do -- collects parts in Cutscene3
+						if v:IsA("ImageLabel") then
+							v.Visible = true -- every ImageLabel in visible for Cutscene3!
+						end
+						if v:IsA("TextLabel") then
+							v.Visible = true -- every TextLabel in visible for Cutscene3!
+						end
+					end
+					tw:Create(fr,TweenInfo.new(0.5),{BackgroundTransparency = 1}):Play()
+					fr.FrameTxt.Visible = true
+					fr.FrameTxt.Textmad.Text = "We live, we love, we lie" -- Text Change For Cutscene lyrics 3x
+					soundservice.Modes.SmurfEng.Ended:Connect(function() -- SmurfEng if was ended then function!
+						fr.FrameTxt.Visible = false -- Unvisible
+						fr.FrameTxt.Textmad.Text = "" -- Text is void now
+						us.MouseIconEnabled = true -- Client MouseCursor in enabled/visible
+						for _, v in pairs(fr.Cut3:GetDescendants()) do
+							if v:IsA("ImageLabel") then
+								v.Visible = false
+							end
+							if v:IsA("TextLabel") then
+								v.Visible = false
+							end
+						end
+						tw:Create(fr,TweenInfo.new(0.5),{BackgroundTransparency = 0}):Play()
+						game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(false) -- Sending Info about client unplaying
+						task.wait(1.5) -- Waiting 1.5 sec
+						repf.MainLua.Settings.Minigames.Value = true -- Minigames now enabled for client!
+						soundservice.Menu.Background:Play() -- Background again playing
+						tw:Create(fr,TweenInfo.new(1),{BackgroundTransparency = 1}):Play() 
+						tw:Create(soundservice.Menu.Background,TweenInfo.new(2),{Volume = 0.59}):Play()
+						menu.MainMenuBackground.Visible = true
+						game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true)
+						tgpl = false
+					end)
+				elseif script:WaitForChild("Settings"):WaitForChild("Mode").Value == "Dance" then -- If mode value in Dance 
+					if tgpl == true then return end -- if toggleplay in true then don't working
+					local fr = menu:WaitForChild("Frame")
+					tgpl = true
+					repeat wait() until soundservice:WaitForChild("Modes"):WaitForChild("Dance").Loaded -- Waiting for audio loading
+					game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false) 
+					soundservice:WaitForChild("Menu"):WaitForChild("Click"):Play()
+					tw:Create(soundservice:WaitForChild("Menu"):WaitForChild("Background"),TweenInfo.new(2),{Volume = 0}):Play()
+					tw:Create(fr,TweenInfo.new(2),{BackgroundTransparency = 0}):Play()
+					menu.MainMenuBackground.Visible = false
+					task.wait(2) -- waiting 2 sec
+					game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(true)
+					Camera.CFrame = workspace.CameraStartPosition2.CFrame -- Camera moving to CameraStartPosition2 
+					soundservice.Menu.Background:stop() -- stopped
+					tw:Create(soundservice:WaitForChild("Modes"):WaitForChild("Dance"),TweenInfo.new(2),{Volume = 0.95}):Play() -- smoothly volume up in 2 sec
+					soundservice.Modes.Dance:Play()
+					tw:Create(fr,TweenInfo.new(1),{BackgroundTransparency = 1}):Play()
+					menu.Frame.SkipButton.Visible = true
+					soundservice.Modes.Dance.Ended:Connect(function() -- audio was end 
+						tw:Create(fr,TweenInfo.new(0.5),{BackgroundTransparency = 0}):Play()
+						game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(false)
+						wait(1.5)
+						Camera.CFrame = workspace.CameraStartPosition.CFrame -- Camera moving to CameraStartPosition2 
+						repf.MainLua.Settings.Minigames.Value = true
+						fr.SkipButton.Visible = false -- SkipButton unvisible
+						soundservice.Menu.Background:Play()
+						tw:Create(fr,TweenInfo.new(1),{BackgroundTransparency = 1}):Play()
+						tw:Create(soundservice.Menu.Background,TweenInfo.new(2),{Volume = 0.59}):Play()
+						menu.MainMenuBackground.Visible = true
+						game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true) 
+						tgpl = false
+					end)
+				end
+			elseif v.Name == "SettingsButton" then -- Name of button
+				if tgdn == true then  -- toggledonate in true then
+					tgdn = false
+					v.Parent.DonatesFrame.Visible = false -- frame unvisble
+					v.Parent.DonateButton.Text = "Donates" -- text changed
+				end
+				if tgst == false then
+					tgst = true
+					v.Text = ">Settings<"
+					v.Parent.SettingsFrame.Visible = true
+					game:GetService("SoundService"):WaitForChild("Menu"):WaitForChild("Click"):Play()
+				else
+					tgst = false
+					v.Text = "Settings"
+					v.Parent.SettingsFrame.Visible = false
+					game:GetService("SoundService"):WaitForChild("Menu"):WaitForChild("Click"):Play()
+				end
+			elseif v.Name == "LeaderboardButton" then
+				if not tglg then
+					tglg = true
+					v.Text = "Back To Lobby"
+					game:GetService("SoundService"):WaitForChild("Menu"):WaitForChild("Click"):Play()
+					Camera.CFrame = workspace.CameraStartPosition3.CFrame -- Camera moving to CameraStartPosition3
+				else
+					tglg = false
+					v.Text = "Leaderboard"
+					game:GetService("SoundService"):WaitForChild("Menu"):WaitForChild("Click"):Play()
+					Camera.CFrame = workspace.CameraStartPosition.CFrame -- Camera moving to CameraStartPosition
+				end
+			elseif v.Name == "DonateButton" then
+				if tgst == true then
+					tgst = false
+					v.Parent.SettingsFrame.Visible = false
+					v.Parent.SettingsButton.Text = "Settings"
+				end
+				if tgdn == false then
+					tgdn = true
+					v.Text = ">Donates<"
+					v.Parent.DonatesFrame.Visible = true
+					game:GetService("SoundService"):WaitForChild("Menu"):WaitForChild("Click"):Play()
+				else
+					tgdn = false
+					v.Text = "Donates"
+					v.Parent.DonatesFrame.Visible = false
+					game:GetService("SoundService"):WaitForChild("Menu"):WaitForChild("Click"):Play()
+				end
+			elseif v.Name == "MiniGameButton" then
+				if tg then return end
+				tg = true
+				if repf:WaitForChild("MainLua"):WaitForChild("Settings"):WaitForChild("Minigames").Value == true then -- if minigames enabled then
+					local fr = menu:WaitForChild("Frame2") -- menu wait for frame2
+					game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false) -- Playerlist unvisble
+					game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true) -- Chat unvisble
+					tw:Create(fr,TweenInfo.new(0.5),{BackgroundTransparency = 0}):Play()
+					menu.MainMenuBackground.Visible = false
+					game:GetService("SoundService"):WaitForChild("Menu"):WaitForChild("Click"):Play()
+					tw:Create(soundservice.Menu.Background,TweenInfo.new(0.59),{Volume = 0}):Play()
+					wait(0.65)
+					if not workspace.MinigameCm:WaitForChild("ClickPart"):FindFirstChild("Part") then -- if not part in workspace then>
+						game:GetService("ReplicatedStorage").Map.Event.Clicks.Part.Parent = workspace.MinigameCm.ClickPart -- Part in workspace.MinigameCm.ClickPart
+					end
+					script.Settings.SmurfScreen.Value = 1 -- SmurfScreen for check in 1
+					script.Event.chart.Part1.Disabled = false -- localscript undisabled
+					script.Event.MainLua.Disabled = false -- localscript undisabled
+					menu.Frame2.FrameTxt.Visible = true
+					menu.Frame2.FrameTxt.Textmad.Text = "Hi, you need to find a smurf cat and try to get 10 smurf cats for a free badge!" -- text changed for minigames
+					soundservice.Menu.Background:Stop()
+					soundservice.Menu.Background.Experiments:Play()
+					tw:Create(soundservice.Menu.Background.Experiments,TweenInfo.new(2),{Volume = 0.59}):Play()
+					pcall(function() -- for not errors
+						Camera.CFrame = workspace:WaitForChild("MinigameCm", 60 ):WaitForChild("Cut1", 40).CFrame
+					end)
+					tw:Create(fr,TweenInfo.new(0.5),{BackgroundTransparency = 1}):Play()
+				end
+				tg = false
+			end
+		end)
+	end
+end
